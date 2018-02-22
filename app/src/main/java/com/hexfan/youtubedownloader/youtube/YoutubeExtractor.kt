@@ -191,39 +191,39 @@ class YoutubeExtractor {
                    youtubeService: YoutubeService,
                    jsEvaluator: JsEvaluator){
 
-            getYtFilesWithSignature(oldOutputMap, videoId, youtubeService)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        jsEvaluator.evaluate(it, JsCallback {
-                            signature ->
-
-                                val sigs = signature.split("\n".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                                var i = 0
-                                while (i < encSignatures.size() && i < sigs.size) {
-                                    val key = encSignatures.keyAt(i)
-                                    if (key == 0) {
-                                        dashMpdUrl = dashMpdUrl?.replace("/s/" + encSignatures.get(key), "/signature/" + sigs[i])
-                                    } else {
-                                        var url = ytFiles.get(key).url
-                                        url =  url + "&signature=" + sigs[i]
-                                        val newFile = YtFile(FORMAT_MAP.get(key), url)
-                                        ytFiles.put(key, newFile)
-                                    }
-                                    i++
-
-                                }
-
-                            publisher.onNext(ExtractResult(ytFiles, videoMeta))
-                        })
-                    }
+//            getYtFilesWithSignature(oldOutputMap, videoId, youtubeService)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe {
+//                        jsEvaluator.evaluate(it, JsCallback {
+//                            signature ->
+//
+//                                val sigs = signature.split("\n".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+//                                var i = 0
+//                                while (i < encSignatures.size() && i < sigs.size) {
+//                                    val key = encSignatures.keyAt(i)
+//                                    if (key == 0) {
+//                                        dashMpdUrl = dashMpdUrl?.replace("/s/" + encSignatures.get(key), "/signature/" + sigs[i])
+//                                    } else {
+//                                        var url = ytFiles.get(key).url
+//                                        url =  url + "&signature=" + sigs[i]
+//                                        val newFile = YtFile(FORMAT_MAP.get(key), url)
+//                                        ytFiles.put(key, newFile)
+//                                    }
+//                                    i++
+//
+//                                }
+//
+//                            publisher.onNext(ExtractResult(ytFiles, videoMeta))
+//                        })
+//                    }
 
         }
 
         fun getYtFilesWithSignature(oldOutputMap: String,
                                     videoId: String,
                                     youtubeService: YoutubeService): Flowable<String>{
-            // Some videos are using a ciphered signature we need to get the
+            // Some videoFile are using a ciphered signature we need to get the
             // deciphering js-file from the youtubepage.
             var outputMap = oldOutputMap
             var mat: Matcher

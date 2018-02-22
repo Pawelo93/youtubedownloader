@@ -1,4 +1,4 @@
-package com.hexfan.youtubedownloader
+package com.hexfan.youtubedownloader.download
 
 import android.app.DownloadManager
 import android.arch.lifecycle.ViewModelProviders
@@ -11,8 +11,12 @@ import android.support.v7.app.AppCompatActivity
 import android.util.SparseArray
 import android.view.View
 import android.widget.Button
+import com.hexfan.youtubedownloader.R
+import com.hexfan.youtubedownloader.createMyDirectory
+import com.hexfan.youtubedownloader.videoPath
 import com.hexfan.youtubedownloader.youtube.VideoMeta
 import com.hexfan.youtubedownloader.youtube.YtFile
+import com.snatik.storage.Storage
 import dagger.android.AndroidInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -27,7 +31,8 @@ class DownloadActivity : AppCompatActivity() {
     lateinit var factory: DownloadViewModel.Factory
     lateinit var viewModel: DownloadViewModel
 
-    lateinit var youtubeLink: String
+    @Inject
+    lateinit var storage: Storage
 
     companion object {
         val KEY_YTLINK = "yt_link"
@@ -76,10 +81,10 @@ class DownloadActivity : AppCompatActivity() {
             // ytFile represents one file with its url and meta data
             val ytFile = ytFiles.get(itag)
 
-            // Just add videos in a decent format => height -1 = audio
+            // Just add videoFile in a decent format => height -1 = audio
                 addButtonToMainLayout(videoMeta.title, ytFile)
-            if (ytFile.format.height == -1 || ytFile.format.height >= 360) {
-            }
+//            if (ytFile.format.height == -1 || ytFile.format.height >= 360) {
+//            }
             i++
         }
     }
@@ -109,13 +114,14 @@ class DownloadActivity : AppCompatActivity() {
     }
 
     private fun downloadFromUrl(youtubeDlUrl: String, downloadTitle: String, fileName: String) {
+
         val uri = Uri.parse(youtubeDlUrl)
         val request = DownloadManager.Request(uri)
         request.setTitle(downloadTitle)
 
         request.allowScanningByMediaScanner()
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+        request.setDestinationInExternalPublicDir(storage.externalStorageDirectory, fileName)
 
         val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         manager.enqueue(request)

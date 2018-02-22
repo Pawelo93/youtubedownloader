@@ -2,8 +2,13 @@ package com.hexfan.youtubedownloader.di
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
+import com.hexfan.youtubedownloader.MainApplication
 import com.hexfan.youtubedownloader.api.AuthorizingInterceptor
 import com.hexfan.youtubedownloader.api.YoutubeApiService
+import com.snatik.storage.Storage
+import com.squareup.picasso.Picasso
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -22,8 +27,27 @@ import javax.inject.Singleton
 class AppModule {
 
     @Provides
-    fun applicationContext(application: Application): Context {
+    @Singleton
+    fun provideApplicationContext(application: Application): Context {
         return application
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(application: MainApplication): SharedPreferences{
+        return PreferenceManager.getDefaultSharedPreferences(application)
+    }
+
+    @Provides
+    @Singleton
+    fun providePicasso(application: MainApplication): Picasso{
+        return Picasso.with(application)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStorage(application: MainApplication): Storage{
+        return Storage(application)
     }
 
     @Provides
@@ -57,15 +81,6 @@ class AppModule {
         interceptor.level = HttpLoggingInterceptor.Level.BASIC
         return interceptor
     }
-
-//    @Provides
-//    @Named("withoutAuthorization")
-//    @Singleton
-//    fun httpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
-//        return OkHttpClient.Builder()
-//                .addInterceptor(loggingInterceptor)
-//                .build()
-//    }
 
     @Provides
     @Singleton

@@ -36,7 +36,7 @@ public abstract class OldYouTubeExtractor extends AsyncTask<String, Void, Sparse
 
     private final static boolean CACHING = true;
 
-    protected static boolean LOGGING = true;
+    protected static boolean LOGGING = false;
 
     private final static String LOG_TAG = "YouTubeExtractor";
     private final static String CACHE_FILE_NAME = "decipher_js_funct";
@@ -158,7 +158,7 @@ public abstract class OldYouTubeExtractor extends AsyncTask<String, Void, Sparse
     /**
      * Start the extraction.
      *
-     * @param youtubeLink       the youtube page link or video id
+     * @param youtubeLink       the youtube page link or video idValue
      * @param parseDashManifest true if the dash manifest should be downloaded and parsed
      * @param includeWebM       true if WebM streams should be extracted
      */
@@ -177,6 +177,7 @@ public abstract class OldYouTubeExtractor extends AsyncTask<String, Void, Sparse
         if (ytUrl == null) {
             return null;
         }
+
         Matcher mat = patYouTubePageLink.matcher(ytUrl);
         if (mat.find()) {
             videoID = mat.group(3);
@@ -267,7 +268,7 @@ public abstract class OldYouTubeExtractor extends AsyncTask<String, Void, Sparse
         }
 
 
-        // Some videos are using a ciphered signature we need to get the
+        // Some videoFile are using a ciphered signature we need to get the
         // deciphering js-file from the youtubepage.
         if (streamMap == null || !streamMap.contains("use_cipher_signature=False")) {
             // Get the video directly from the youtubepage
@@ -668,7 +669,7 @@ public abstract class OldYouTubeExtractor extends AsyncTask<String, Void, Sparse
      * Set default protocol of the returned urls to HTTP instead of HTTPS.
      * HTTP may be blocked in some regions so HTTPS is the default value.
      * <p/>
-     * Note: Enciphered videos require HTTPS so they are not affected by
+     * Note: Enciphered videoFile require HTTPS so they are not affected by
      * this.
      */
     public void setDefaultHttpProtocol(boolean useHttp) {
@@ -732,6 +733,11 @@ public abstract class OldYouTubeExtractor extends AsyncTask<String, Void, Sparse
                                 } finally {
                                     lock.unlock();
                                 }
+                            }
+
+                            @Override
+                            public void onError(String s) {
+                                Timber.e("Error in js "+s);
                             }
 
 //                            @Override

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import com.hexfan.youtubedownloader.download.DownloadActivity
 import com.hexfan.youtubedownloader.settings.SettingsActivity
 import timber.log.Timber
 
@@ -14,8 +15,8 @@ class EntryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_entry)
 
         // Check how it was started and if we can get the youtube link
-        if (savedInstanceState == null && Intent.ACTION_SEND == intent.action &&
-                intent.type != null && "text/plain" == intent.type) {
+        if (savedInstanceState == null && intent.action == Intent.ACTION_SEND &&
+                intent.type != null && intent.type == "text/plain") {
 
             val link = intent.getStringExtra(Intent.EXTRA_TEXT)
 
@@ -29,7 +30,7 @@ class EntryActivity : AppCompatActivity() {
                 finish()
             }
         } else {
-            finish()
+
         }
     }
 }

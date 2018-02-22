@@ -3,7 +3,7 @@ package com.hexfan.youtubedownloader.youtube
 /**
  * Created by Pawel on 14.02.2018.
  */
-class VideoMeta(
+data class VideoMeta(
         val videoId: String,
         val title: String,
         val author: String,

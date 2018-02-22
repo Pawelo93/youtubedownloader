@@ -5,7 +5,8 @@ package com.hexfan.youtubedownloader.api
  */
 data class PlaylistResponse(val etag: String,
                             val kind: String,
-                            val pageInfo: PageInfo)
+                            val pageInfo: PageInfo,
+                            val items: List<Item>)
 
 data class PageInfo(val totalResults: Int,
                     val resultsPerPage: Int)
@@ -14,10 +15,17 @@ data class Item(val kind: String,
                 val etag: String,
                 val id: String,
                 val snippet: Snippet,
-                val contentDetails: ContentDetails)
+                val contentDetails: ContentDetails,
+                var progress: Int){
+    companion object {
+        val NOT_DOWNLOADED = -1
+        val IN_PROGRESS = 0
+        val DOWNLOADED = 100
+    }
+}
 
 data class ContentDetails(val videoId: String,
-                          val videoPublishedAt: String)
+                          var videoPublishedAt: String)
 
 data class Snippet(val publishedAt: String,
                    val channelId: String,
@@ -27,8 +35,7 @@ data class Snippet(val publishedAt: String,
                    val channelTitle: String,
                    val playlistId: String,
                    val position: String,
-                   val resourceId: ResourceId
-                   )
+                   val resourceId: ResourceId)
 
 data class Thumbnail(val url: String,
                      val width: Int,

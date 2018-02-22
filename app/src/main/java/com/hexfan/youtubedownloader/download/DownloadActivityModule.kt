@@ -1,13 +1,11 @@
-package com.hexfan.youtubedownloader.di
+package com.hexfan.youtubedownloader.download
 
-import com.evgenii.jsevaluator.JsEvaluator
-import com.hexfan.youtubedownloader.DownloadActivity
+import android.content.Context
+import com.hexfan.youtubedownloader.MainApplication
 import com.hexfan.youtubedownloader.api.DownloadApiService
 import com.hexfan.youtubedownloader.api.YoutubeService
 import com.hexfan.youtubedownloader.api.YoutubeApiService
 import com.hexfan.youtubedownloader.interactors.DownloadInteractor
-import com.hexfan.youtubedownloader.DownloadViewModel
-import com.hexfan.youtubedownloader.youtube.YoutubeExtractor
 import dagger.Module
 import dagger.Provides
 
@@ -23,13 +21,8 @@ class DownloadActivityModule {
     }
 
     @Provides
-    fun provideJsEvaluator(activity: DownloadActivity): JsEvaluator{
-        return JsEvaluator(activity)
-    }
-
-    @Provides
-    fun provideDownloadInteractor(activity: DownloadActivity, youtubeService: YoutubeService): DownloadInteractor {
-        return DownloadInteractor(activity, youtubeService)
+    fun provideDownloadInteractor(context: MainApplication, youtubeService: YoutubeService): DownloadInteractor {
+        return DownloadInteractor(context, youtubeService)
     }
 
     @Provides

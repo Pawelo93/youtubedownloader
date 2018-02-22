@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">YoutubeDownloader</string>
+    
+    <string-array name="quality">
+        <item>Najniższa</item>
+        <item>Średnia</item>
+        <item>Wysoka</item>
+    </string-array>
 </resources>
