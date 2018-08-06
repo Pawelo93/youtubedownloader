@@ -2,6 +2,7 @@ package com.hexfan.youtubedownloader.browse
 
 import android.app.DownloadManager
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.Transformations.map
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -100,16 +101,50 @@ class BrowseActivity : AppCompatActivity(), BrowseAdapter.AdapterContract {
     fun downloadPlaylist(playlist: List<Item>) {
 
         Observable.fromIterable(playlist)
-                .filter { it.progress == Item.NOT_DOWNLOADED }
-                .firstElement()
-                .downloadVideo()
-                .subscribe {
-                    Timber.e("name ${it.title} prog ${it.progress}")
-                    browseAdapter.findId(it.videoId) {
-                        Timber.e("progress ${it.progress}")
-                        progress = it.progress
-                    }
+                .flatMap {
+                    viewModel.download(it.contentDetails.videoId, manager)
                 }
+                .flatMap {
+                    viewModel.subscribeProgress(it, manager)
+                }
+                .background()
+                .subscribe({
+                    Timber.e("success $it")
+                }, {
+                    Timber.e("error $it")
+                })
+
+
+
+//        viewModel.download(item.contentDetails.videoId, manager)
+//                .flatMap {
+//                    Timber.e("im in flat map prog ${item.progress}")
+//                    viewModel.subscribeProgress(it, manager)
+//                }
+//                .subscribe({
+//                    Timber.e("progress $it")
+//                    item.progress = it
+//                    changeProgress(itemView, item)
+//                }, {
+//                    Timber.e("error $it")
+//                }, {
+//                    Timber.e("COMPLETED")
+//                    item.progress = Item.DOWNLOADED
+//                    changeProgress(itemView, item)
+//                })
+
+
+//        Observable.fromIterable(playlist)
+//                .filter { it.progress == Item.NOT_DOWNLOADED }
+//                .firstElement()
+//                .downloadVideo()
+//                .subscribe {
+//                    Timber.e("name ${it.title} prog ${it.progress}")
+//                    browseAdapter.findId(it.videoId) {
+//                        Timber.e("progress ${it.progress}")
+//                        progress = it.progress
+//                    }
+//                }
     }
 
     data class Req(val id: Long, val videoMeta: VideoMeta)
@@ -124,7 +159,7 @@ class BrowseActivity : AppCompatActivity(), BrowseAdapter.AdapterContract {
         return viewModel.downloadInteractor.downloadFromId(item.contentDetails.videoId)
                 .background()
                 .map {
-                    val ytFile: YtFile = it.ytFiles?.get(17)!!
+                    val ytFile: YtFile = it.ytFiles?.get(18)!!
 
                     val videoTitle = it.videoMeta!!.title
                     var fileName = if (videoTitle.length > 55) {
@@ -187,27 +222,45 @@ class BrowseActivity : AppCompatActivity(), BrowseAdapter.AdapterContract {
             startActivity(intent)
         }
 
-        changeProgress(itemView, item)
-
-
-        if (item.progress == Item.NOT_DOWNLOADED) {
+        itemView.status.setOnClickListener{
             viewModel.download(item.contentDetails.videoId, manager)
-                    .flatMap {
-                        Timber.e("im in flat map prog ${item.progress}")
-                        viewModel.subscribeProgress(it, manager)
-                    }
-                    .subscribe ({
-                        Timber.e("progress $it")
-                        item.progress = it
-                        changeProgress(itemView, item)
-                    }, {
-                        Timber.e("error $it")
-                    }, {
-                        Timber.e("COMPLETED")
-                        item.progress = Item.DOWNLOADED
-                        changeProgress(itemView, item)
-                    })
+                    .subscribe({ println("SUccess")}, { println("error ${it.message}")})
         }
+
+//        changeProgress(itemView, item)
+
+//        if (item.progress == Item.NOT_DOWNLOADED) {
+//            viewModel.download(item.contentDetails.videoId, manager)
+//                    .subscribe {
+//
+//                        viewModel.subscribeProgress(it, manager)
+//                                .subscribe {
+//                                    item.progress = it
+//                                    changeProgress(itemView, item)
+//                                }
+//
+//                    }
+//
+//        }
+//        // todo first element doesnt downloading, if file is done downloading no ok icon show
+//        if (item.progress == Item.NOT_DOWNLOADED) {
+//            viewModel.download(item.contentDetails.videoId, manager)
+//                    .flatMap {
+//                        Timber.e("im in flat map prog ${item.progress}")
+//                        viewModel.subscribeProgress(it, manager)
+//                    }
+//                    .subscribe ({
+//                        Timber.e("progress $it")
+//                        item.progress = it
+//                        changeProgress(itemView, item)
+//                    }, {
+//                        Timber.e("error $it")
+//                    }, {
+//                        Timber.e("COMPLETED")
+//                        item.progress = Item.DOWNLOADED
+//                        changeProgress(itemView, item)
+//                    })
+//        }
         // check if video is already downloaded
         // true set icon
         // false start downloading, show progressbar
@@ -218,7 +271,7 @@ class BrowseActivity : AppCompatActivity(), BrowseAdapter.AdapterContract {
                 .into(itemView.thumbnail)
     }
 
-    private fun changeProgress(itemView: View, item: Item){
+    private fun changeProgress(itemView: View, item: Item) {
         when (item.progress) {
             -1, 100 -> {
                 itemView.status.visibility = View.VISIBLE

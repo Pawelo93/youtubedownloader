@@ -60,7 +60,7 @@ class BrowseViewModel @Inject constructor(val settingsInteractor: SettingsIntera
         return downloadInteractor.downloadFromId(videoId)
                 .background()
                 .map {
-                    val ytFile: YtFile = it.ytFiles?.get(17)!!
+                    val ytFile: YtFile = it.ytFiles?.get(18)!!
 
                     val videoTitle = it.videoMeta!!.title
                     var fileName = if (videoTitle.length > 55) {
